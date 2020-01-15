@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">UdharTask</string>
+    <string name="could_not_reach_server">Could not reach server..!</string>
+    <string name="server_response_error">Server response error...!</string>
+</resources>
