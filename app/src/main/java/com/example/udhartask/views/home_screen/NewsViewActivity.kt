@@ -15,12 +15,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import com.example.udhartask.R
+import com.example.udhartask.bgservice.SendTimeWork
 import com.example.udhartask.models.Article
 import com.example.udhartask.views.web_view_screen.WebViewActivity
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_news.*
+import java.util.concurrent.TimeUnit
 
 const val NEWS_URL = "news_url"
 class NewsViewActivity : AppCompatActivity() {
@@ -34,14 +37,31 @@ class NewsViewActivity : AppCompatActivity() {
         val rv_adaptor = RVadaptor(this)
         RV_news.adapter =rv_adaptor
 
-        newsViewModel.loadData()
+        newsViewModel.loadData() // This function will trigger the dataload request to repository
         newsViewModel.observableErrorMessage.observe(this, Observer{
-            Snackbar.make(root_layout,it,Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(root_layout,it,Snackbar.LENGTH_SHORT).show()      // observing error
         })
         newsViewModel.observableNewsResponse.observe(this,Observer{
-            rv_adaptor.submitList(it)
+            rv_adaptor.submitList(it)     // observing and submitting list of news
         })
+
+        /**
+         * The following section schedules the workmanager
+         */
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val work = PeriodicWorkRequestBuilder<SendTimeWork>(20, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+        val workManager = WorkManager.getInstance(this)
+        workManager.enqueueUniquePeriodicWork("work",ExistingPeriodicWorkPolicy.KEEP,work)
     }
+
+    /**
+     * RecyclerView adapter for displaying news
+     */
     class RVadaptor(val context:Context):ListAdapter<Article, RVadaptor.ViewHolder>(
         diffcallback
     ){
