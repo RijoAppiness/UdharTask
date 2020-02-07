@@ -2,20 +2,23 @@ package com.example.udhartask.views.home_screen
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.udhartask.R
 import com.example.udhartask.bgservice.SendTimeWork
 import com.example.udhartask.models.Article
@@ -56,7 +59,8 @@ class NewsViewActivity : AppCompatActivity() {
             .setConstraints(constraints)
             .build()
         val workManager = WorkManager.getInstance(this)
-        workManager.enqueueUniquePeriodicWork("work",ExistingPeriodicWorkPolicy.KEEP,work)
+        //workManager.enqueueUniquePeriodicWork("work",ExistingPeriodicWorkPolicy.KEEP,work)
+        workManager.enqueue(work)
     }
 
     /**
